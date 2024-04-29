@@ -57,7 +57,7 @@ const sendPostRequest = async (data) => {
 
   try {
     // console.log("Sending request with file content...");
-    const response = await axios.post("https://nidhi.requestcatcher.com/test", payload, {
+    const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
       headers: { "Content-Type": "application/json" },
     });
     // console.log("Response:", response.data);
