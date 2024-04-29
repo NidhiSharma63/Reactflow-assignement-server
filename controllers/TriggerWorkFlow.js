@@ -72,9 +72,9 @@ const triggerWorkFlow = async (req, res, next) => {
       }
     }
 
-    statusUpdates.status = "InProgress";
-    statusUpdates.step = "Start";
     res.status(200).send("Done");
+    // statusUpdates.status = "InProgress";
+    // statusUpdates.step = "Start";
 
     // res.end();
     // res.end();
