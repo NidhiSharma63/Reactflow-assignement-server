@@ -43,7 +43,7 @@ const triggerWorkFlow = async (req, res, next) => {
         case "Wait":
           statusUpdates.status = "InProgress";
           statusUpdates.step = "Wait";
-          await wait(60000);
+          await wait(1000);
 
           break;
 
@@ -73,8 +73,8 @@ const triggerWorkFlow = async (req, res, next) => {
     }
 
     res.status(200).send("Done");
-    // statusUpdates.status = "InProgress";
-    // statusUpdates.step = "Start";
+    statusUpdates.status = "InProgress";
+    statusUpdates.step = "Start";
 
     // res.end();
     // res.end();
