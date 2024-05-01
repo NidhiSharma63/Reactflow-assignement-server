@@ -32,7 +32,7 @@ const triggerWorkFlow = async (req, res) => {
           io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           data = await filterData(data);
           break;
-        case "Convert To JSON":
+        case "Convert Format":
           io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           data = convertToJson(data);
           break;
@@ -43,7 +43,7 @@ const triggerWorkFlow = async (req, res) => {
         case "Wait":
           io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
 
-          await wait(5000);
+          await wait(60000);
           break;
         case "End":
           // Emitting an update at the end of the workflow
