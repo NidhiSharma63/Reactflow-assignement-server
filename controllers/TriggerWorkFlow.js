@@ -26,28 +26,21 @@ const triggerWorkFlow = async (req, res, next) => {
 
       switch (step) {
         case "Start":
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         case "Filter Data":
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           data = await filterData(data);
           break;
         case "Convert Format":
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           data = await parseCsv(file.buffer);
           break;
         case "Send Post Request":
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           await sendPostRequest(data);
           break;
         case "Wait":
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
-
           await wait(600);
           break;
         case "End":
           // Emitting an update at the end of the workflow
-          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         default:
           throw new Error(`Unknown step: ${step}`);
