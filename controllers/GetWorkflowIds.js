@@ -5,6 +5,7 @@ const getWorkflowIds = async (req, res, next) => {
     const { userId } = req.query;
     const findWorkFlowIds = await WorkFlow.find({ userId });
     const workFlowIds = findWorkFlowIds.map((workflow) => workflow.workFlowId);
+    // send response
     res.send(workFlowIds);
   } catch (error) {
     next(error);

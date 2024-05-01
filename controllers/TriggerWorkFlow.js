@@ -6,6 +6,7 @@ const triggerWorkFlow = async (req, res) => {
   const { file } = req;
   const { workflowId } = req.body;
 
+  // check if any field is missing or not
   try {
     if (!file) {
       throw new Error("No CSV file uploaded");

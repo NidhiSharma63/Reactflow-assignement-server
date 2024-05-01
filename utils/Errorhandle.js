@@ -1,5 +1,4 @@
 const errorHandle = (error, _req, res, next) => {
-  // console.log({ error }, error.message);
   if (
     error.message.includes("Missing") ||
     error.message.includes("already exists") ||
