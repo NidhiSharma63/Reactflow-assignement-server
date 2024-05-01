@@ -43,37 +43,34 @@ const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const convertToJson = (data) => {
-  try {
-    const jsonString = JSON.stringify(data); // Log to verify JSON string
-
-    return jsonString;
-  } catch (error) {
-    throw new Error("Error converting data to JSON"); // Propagate error
-  }
-};
-
 const sendPostRequest = async (data) => {
-  // Assuming 'buffer' is the buffer of your file
-  // const fileContent = buffer.toString("utf8"); // Convert buffer to string
-
-  // Create a JSON payload with the file content
-  const payload = {
-    fileContent: data,
-  };
-
   try {
-    // console.log("Sending request with file content...");
-    const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
-      headers: { "Content-Type": "application/json" || "multipart/form-data" },
-    });
-    // console.log("Response:", response.data);
+    // check if the data is csv or not
+    const isCSV = data?.buffer ? true : false;
+    if (isCSV) {
+      //  Create a form data object with the file
+      const formData = new FormData();
+      formData.append("csvFile", data.buffer);
 
-    return response.data;
+      // Send the POST request
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/", formData);
+      // console.log("Response:", response.data);
+      return response.data;
+    } else {
+      // Create a JSON payload with the file content
+      const payload = {
+        fileContent: data,
+      };
+      // Send the POST request
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
+        headers: { "Content-Type": "application/json" || "multipart/form-data" },
+      });
+      return response.data;
+    }
   } catch (error) {
     console.error("Error during POST request:", error.message);
     throw new Error("Error during POST request");
   }
 };
 
-export { convertToJson, filterData, parseCsv, sendPostRequest, wait };
+export { filterData, parseCsv, sendPostRequest, wait };
