@@ -19,17 +19,22 @@ const filterData = (data) => {
   // console.log({ data }, JSON.parse(data), typeof data);
 
   /** if type of data is string then parse it to json */
-  if (typeof data === "string") {
-    data = JSON.parse(data);
+  try {
+    if (typeof data === "string") {
+      data = JSON.parse(data);
+    }
+
+    return data.map((item) => {
+      return Object.fromEntries(
+        Object.entries(item).map(([key, value]) => {
+          // Check if the value is a string and convert it to lowercase
+          return [key, typeof value === "string" ? value.toLowerCase() : value];
+        })
+      );
+    });
+  } catch (error) {
+    throw new Error("Error while parsing data");
   }
-  return data.map((item) => {
-    return Object.fromEntries(
-      Object.entries(item).map(([key, value]) => {
-        // Check if the value is a string and convert it to lowercase
-        return [key, typeof value === "string" ? value.toLowerCase() : value];
-      })
-    );
-  });
 };
 
 const wait = (ms) => {
@@ -39,10 +44,10 @@ const wait = (ms) => {
 const convertToJson = (data) => {
   try {
     const jsonString = JSON.stringify(data); // Log to verify JSON string
+
     return jsonString;
   } catch (error) {
-    console.error("Error converting data to JSON:", error);
-    throw error; // Propagate error
+    throw new Error("Error converting data to JSON"); // Propagate error
   }
 };
 
@@ -65,7 +70,7 @@ const sendPostRequest = async (data) => {
     return response.data;
   } catch (error) {
     console.error("Error during POST request:", error.message);
-    throw error;
+    throw new Error("Error during POST request");
   }
 };
 

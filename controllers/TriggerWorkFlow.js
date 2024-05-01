@@ -2,7 +2,7 @@ import WorkFlow from "../schema/WorkFlowSchema.js";
 import { convertToJson, filterData, parseCsv, sendPostRequest, wait } from "../utils/WorkFlowFunction.js";
 
 import { io } from "../utils/Socket.js";
-const triggerWorkFlow = async (req, res) => {
+const triggerWorkFlow = async (req, res, next) => {
   const { file } = req;
   const { workflowId } = req.body;
 
@@ -44,7 +44,7 @@ const triggerWorkFlow = async (req, res) => {
         case "Wait":
           io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
 
-          await wait(60000);
+          await wait(600);
           break;
         case "End":
           // Emitting an update at the end of the workflow
@@ -58,7 +58,7 @@ const triggerWorkFlow = async (req, res) => {
     res.status(200).send("Workflow completed successfully");
   } catch (error) {
     io.emit("workflowUpdate", { workflowId, error: error.message, status: "Error" });
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 export { triggerWorkFlow };
