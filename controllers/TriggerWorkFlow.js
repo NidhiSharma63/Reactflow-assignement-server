@@ -1,5 +1,5 @@
 import WorkFlow from "../schema/WorkFlowSchema.js";
-import { convertToJson, filterData, parseCsv, sendPostRequest, wait } from "../utils/WorkFlowFunction.js";
+import { filterData, parseCsv, sendPostRequest, wait } from "../utils/WorkFlowFunction.js";
 
 import { io } from "../utils/Socket.js";
 const triggerWorkFlow = async (req, res, next) => {
@@ -18,7 +18,7 @@ const triggerWorkFlow = async (req, res, next) => {
     }
 
     const sequence = workflow.workFlowSequence;
-    let data;
+    let data = file;
 
     for (const step of sequence) {
       // Emitting an update at the start of each step
@@ -26,29 +26,28 @@ const triggerWorkFlow = async (req, res, next) => {
 
       switch (step) {
         case "Start":
-          data = await parseCsv(file.buffer);
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         case "Filter Data":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           data = await filterData(data);
           break;
         case "Convert Format":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
-          data = convertToJson(data);
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          data = await parseCsv(file.buffer);
           break;
         case "Send Post Request":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           await sendPostRequest(data);
           break;
         case "Wait":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
 
           await wait(600);
           break;
         case "End":
           // Emitting an update at the end of the workflow
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
+          // io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         default:
           throw new Error(`Unknown step: ${step}`);

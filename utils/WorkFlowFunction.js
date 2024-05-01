@@ -16,10 +16,11 @@ const parseCsv = (buffer) => {
 };
 
 const filterData = (data) => {
-  // console.log({ data }, JSON.parse(data), typeof data);
-
   /** if type of data is string then parse it to json */
   try {
+    if (data?.buffer) {
+      throw new Error("The Filter Data is not applicable to CSV file");
+    }
     if (typeof data === "string") {
       data = JSON.parse(data);
     }
@@ -33,7 +34,8 @@ const filterData = (data) => {
       );
     });
   } catch (error) {
-    throw new Error("Error while parsing data");
+    throw new Error(error);
+    // return error;
   }
 };
 
@@ -63,7 +65,7 @@ const sendPostRequest = async (data) => {
   try {
     // console.log("Sending request with file content...");
     const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" || "multipart/form-data" },
     });
     // console.log("Response:", response.data);
 
