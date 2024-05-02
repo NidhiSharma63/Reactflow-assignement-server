@@ -12,4 +12,15 @@ const getWorkflowIds = async (req, res, next) => {
   }
 };
 
-export default getWorkflowIds;
+const getWorkFlowDetails = async (req, res, next) => {
+  try {
+    const { workFlowId } = req.query;
+    const workFlowDetails = await WorkFlow.findOne({ workFlowId });
+    // console.log({ workFlowDetails, workFlowId });
+    res.send(workFlowDetails);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { getWorkFlowDetails, getWorkflowIds };

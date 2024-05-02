@@ -2,7 +2,7 @@ import WorkFlow from "../schema/WorkFlowSchema.js";
 
 const createWorkFlow = async (req, res, next) => {
   try {
-    const { userId, workFlowSequence, workFlowId } = req.body;
+    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes } = req.body;
     if (!userId || !workFlowSequence) throw new Error("Missing Data");
 
     /**
@@ -33,6 +33,8 @@ const createWorkFlow = async (req, res, next) => {
       userId,
       workFlowSequence,
       workFlowId,
+      workFlowEdges,
+      workFlowNodes,
     });
     await workFlow.save();
     res.status(200).send("workFlow");
@@ -41,4 +43,20 @@ const createWorkFlow = async (req, res, next) => {
   }
 };
 
-export default createWorkFlow;
+/** update workflow */
+const updateWorkFlow = async (req, res, next) => {
+  try {
+    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes } = req.body;
+    if (!userId || !workFlowSequence) throw new Error("Missing Data");
+    const workFlow = await WorkFlow.findOne({ workFlowId });
+    if (!workFlow) throw new Error("Workflow not found");
+    workFlow.workFlowSequence = workFlowSequence;
+    workFlow.workFlowEdges = workFlowEdges;
+    workFlow.workFlowNodes = workFlowNodes;
+    await workFlow.save();
+    res.status(200).send("workFlow");
+  } catch (error) {
+    next(error);
+  }
+};
+export { createWorkFlow, updateWorkFlow };

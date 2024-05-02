@@ -21,6 +21,28 @@ const workFlowSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  workFlowEdges: [
+    {
+      id: String,
+      source: String,
+      sourceHandle: { type: String, default: null },
+      target: String,
+      targetHandle: { type: String, default: null },
+    },
+  ],
+  workFlowNodes: [
+    {
+      id: { type: String },
+      data: {
+        label: { type: String },
+      },
+      height: { type: Number },
+      position: { x: { type: Number }, y: { type: Number } },
+      positionAbsolute: { x: { type: Number }, y: { type: Number } },
+      type: { type: String },
+      width: { type: Number },
+    },
+  ],
 });
 
 // now we need to create collection
