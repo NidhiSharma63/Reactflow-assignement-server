@@ -7,7 +7,6 @@ const parseCsv = (buffer) => {
     Papa.parse(csvString, {
       header: true,
       complete: (results) => {
-        // console.log(results.data, "parsed data");
         return resolve(results.data);
       },
       error: (error) => reject(error),
@@ -15,58 +14,99 @@ const parseCsv = (buffer) => {
   });
 };
 
-const filterData = (data) => {
-  // console.log({ data }, JSON.parse(data), typeof data);
+const filterData = (data, step) => {
+  try {
+    // check if the data is csv or not
+    if (data?.buffer) {
+      const csvString = data.buffer.toString("utf8");
+      // console.log({ csvString }, "and", data);
+      const rows = csvString.split("\n").map((row) => row.split(","));
+      if (rows.length < 1) {
+        throw new Error("Empty CSV data.");
+      }
 
-  /** if type of data is string then parse it to json */
-  if (typeof data === "string") {
-    data = JSON.parse(data);
+      // Get header row to find the column index
+      const headers = rows[0];
+      const columnIndex = headers.findIndex((header) => header.trim() === step.filterValue);
+
+      // Check if the column exists
+      if (columnIndex === -1) {
+        throw new Error(`Missing column '${step.filterValue}' in the CSV file`);
+      }
+
+      // Process each row
+      const processedRows = rows.map((row, rowIndex) => {
+        if (rowIndex === 0) return row; // Return the header as is
+
+        const cellValue = row[columnIndex];
+        // Check if the cell contains only alphabetic characters and then convert to lowercase
+        if (cellValue && isNaN(Number(cellValue))) {
+          row[columnIndex] = cellValue.toLowerCase();
+        }
+        return row;
+      });
+
+      // Join processed rows back into a CSV string
+      const processedCsv = processedRows.map((row) => row.join(",")).join("\n");
+      const newFile = { ...data, buffer: Buffer.from(processedCsv) };
+      return newFile;
+    } else {
+      const jsonData = typeof data === "string" ? JSON.parse(data) : data;
+      // console.log({ data }, { jsonData });
+
+      // Validate that the provided field exists
+      if (jsonData.length > 0 && !(step.filterValue in jsonData[0])) {
+        throw new Error(`Missing column '${step.filterValue}' in the file`);
+      }
+
+      // Iterate over each item and convert the specified field to lowercase if non-numeric
+      const processedData = jsonData.map((item) => {
+        if (item[step.filterValue] && isNaN(Number(item[step.filterValue]))) {
+          item[step.filterValue] = item[step.filterValue].toLowerCase();
+        }
+        return item;
+      });
+
+      return processedData;
+    }
+  } catch (error) {
+    throw new Error(error);
+    // return error;
   }
-  return data.map((item) => {
-    return Object.fromEntries(
-      Object.entries(item).map(([key, value]) => {
-        // Check if the value is a string and convert it to lowercase
-        return [key, typeof value === "string" ? value.toLowerCase() : value];
-      })
-    );
-  });
 };
 
 const wait = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const convertToJson = (data) => {
-  try {
-    const jsonString = JSON.stringify(data); // Log to verify JSON string
-    return jsonString;
-  } catch (error) {
-    console.error("Error converting data to JSON:", error);
-    throw error; // Propagate error
-  }
-};
-
 const sendPostRequest = async (data) => {
-  // Assuming 'buffer' is the buffer of your file
-  // const fileContent = buffer.toString("utf8"); // Convert buffer to string
-
-  // Create a JSON payload with the file content
-  const payload = {
-    fileContent: data,
-  };
-
   try {
-    // console.log("Sending request with file content...");
-    const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-    // console.log("Response:", response.data);
+    // check if the data is csv or not
+    const isCSV = data?.buffer ? true : false;
+    if (isCSV) {
+      //  Create a form data object with the file
+      const formData = new FormData();
+      formData.append("csvFile", data.buffer);
 
-    return response.data;
+      // Send the POST request
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/test", formData);
+      // console.log("Response:", response.data);
+      return response.data;
+    } else {
+      // Create a JSON payload with the file content
+      const payload = {
+        fileContent: data,
+      };
+      // Send the POST request
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/test", payload, {
+        headers: { "Content-Type": "application/json" || "multipart/form-data" },
+      });
+      return response.data;
+    }
   } catch (error) {
     console.error("Error during POST request:", error.message);
-    throw error;
+    throw new Error("Error during POST request");
   }
 };
 
-export { convertToJson, filterData, parseCsv, sendPostRequest, wait };
+export { filterData, parseCsv, sendPostRequest, wait };

@@ -1,11 +1,12 @@
 import WorkFlow from "../schema/WorkFlowSchema.js";
-import { convertToJson, filterData, parseCsv, sendPostRequest, wait } from "../utils/WorkFlowFunction.js";
+import { filterData, parseCsv, sendPostRequest, wait } from "../utils/WorkFlowFunction.js";
 
 import { io } from "../utils/Socket.js";
-const triggerWorkFlow = async (req, res) => {
+const triggerWorkFlow = async (req, res, next) => {
   const { file } = req;
   const { workflowId } = req.body;
 
+  // check if any field is missing or not
   try {
     if (!file) {
       throw new Error("No CSV file uploaded");
@@ -17,47 +18,43 @@ const triggerWorkFlow = async (req, res) => {
     }
 
     const sequence = workflow.workFlowSequence;
-    let data;
+    let data = file;
+
+    // console.log(sequence);
 
     for (const step of sequence) {
+      let activeStep = step.type;
       // Emitting an update at the start of each step
-      io.emit("workflowUpdate", { workflowId, step, status: "InProgress" });
 
-      switch (step) {
+      io.emit("workflowUpdate", { workflowId, activeStep, status: "InProgress" });
+
+      switch (step.type) {
         case "Start":
-          data = await parseCsv(file.buffer);
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         case "Filter Data":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
-          data = await filterData(data);
+          data = await filterData(data, step);
           break;
         case "Convert Format":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
-          data = convertToJson(data);
+          data = await parseCsv(file.buffer);
           break;
         case "Send Post Request":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           await sendPostRequest(data);
           break;
         case "Wait":
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
-
-          await wait(60000);
+          await wait(process.env.ENVIRONMENT === "development" ? 1000 : 60000);
           break;
         case "End":
           // Emitting an update at the end of the workflow
-          io.emit("workflowUpdate", { workflowId, step, status: "In Progress" });
           break;
         default:
-          throw new Error(`Unknown step: ${step}`);
+          throw new Error(`Unknown step: ${step.type}`);
       }
     }
 
     res.status(200).send("Workflow completed successfully");
   } catch (error) {
     io.emit("workflowUpdate", { workflowId, error: error.message, status: "Error" });
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 export { triggerWorkFlow };
