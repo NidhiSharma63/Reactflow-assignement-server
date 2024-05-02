@@ -21,14 +21,15 @@ const triggerWorkFlow = async (req, res, next) => {
     let data = file;
 
     for (const step of sequence) {
+      let activeStep = step.type;
       // Emitting an update at the start of each step
-      io.emit("workflowUpdate", { workflowId, step, status: "InProgress" });
+      io.emit("workflowUpdate", { workflowId, activeStep, status: "InProgress" });
 
-      switch (step) {
+      switch (step.type) {
         case "Start":
           break;
         case "Filter Data":
-          data = await filterData(data);
+          data = await filterData(data, step);
           break;
         case "Convert Format":
           data = await parseCsv(file.buffer);
