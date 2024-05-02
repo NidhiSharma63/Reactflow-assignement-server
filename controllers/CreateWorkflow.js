@@ -8,8 +8,8 @@ const createWorkFlow = async (req, res, next) => {
     /**
      * check if workFlow sequence includes start and end more than one times
      */
-    const isStartIncludeMoreThanOne = workFlowSequence.filter((step) => step === "Start").length > 1;
-    const isEndIncludeMoreThanOne = workFlowSequence.filter((step) => step === "End").length > 1;
+    const isStartIncludeMoreThanOne = workFlowSequence.filter((step) => step.type === "Start").length > 1;
+    const isEndIncludeMoreThanOne = workFlowSequence.filter((step) => step.type === "End").length > 1;
 
     if (isStartIncludeMoreThanOne) {
       throw new Error("Start should be included only once");
@@ -19,7 +19,6 @@ const createWorkFlow = async (req, res, next) => {
       throw new Error("End should be included only once");
     }
 
-    console.log(workFlowSequence);
     const isFilterDataNodeIncluded = workFlowSequence.filter((node) => node.type === "Filter Data");
     // check if every filterData node has filterValue field and it is filled
 
