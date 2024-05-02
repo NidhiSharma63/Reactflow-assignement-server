@@ -5,10 +5,18 @@ const workFlowSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  workFlowSequence: {
-    type: [String],
-    required: true,
-  },
+  workFlowSequence: [
+    {
+      type: {
+        type: String,
+        required: true,
+      },
+      filterValue: {
+        type: String,
+        required: false, // Optional field
+      },
+    },
+  ],
   workFlowId: {
     type: String,
     required: true,
