@@ -20,9 +20,10 @@ const triggerWorkFlow = async (req, res, next) => {
     const sequence = workflow.workFlowSequence;
     let data = file;
 
+    // console.log(sequence);
+
     for (const step of sequence) {
       let activeStep = step.type;
-      // console.log({ activeStep });
       // Emitting an update at the start of each step
 
       io.emit("workflowUpdate", { workflowId, activeStep, status: "InProgress" });
@@ -35,7 +36,6 @@ const triggerWorkFlow = async (req, res, next) => {
           break;
         case "Convert Format":
           data = await parseCsv(file.buffer);
-          console.log({ data }, "from convert format");
           break;
         case "Send Post Request":
           await sendPostRequest(data);

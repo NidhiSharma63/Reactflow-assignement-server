@@ -7,7 +7,6 @@ const parseCsv = (buffer) => {
     Papa.parse(csvString, {
       header: true,
       complete: (results) => {
-        console.log(results.data, "parsed data");
         return resolve(results.data);
       },
       error: (error) => reject(error),
@@ -20,7 +19,7 @@ const filterData = (data, step) => {
     // check if the data is csv or not
     if (data?.buffer) {
       const csvString = data.buffer.toString("utf8");
-      console.log({ csvString }, "and", data);
+      // console.log({ csvString }, "and", data);
       const rows = csvString.split("\n").map((row) => row.split(","));
       if (rows.length < 1) {
         throw new Error("Empty CSV data.");
@@ -53,7 +52,7 @@ const filterData = (data, step) => {
       return newFile;
     } else {
       const jsonData = typeof data === "string" ? JSON.parse(data) : data;
-      console.log({ data }, { jsonData });
+      // console.log({ data }, { jsonData });
 
       // Validate that the provided field exists
       if (jsonData.length > 0 && !(step.filterValue in jsonData[0])) {
@@ -90,7 +89,7 @@ const sendPostRequest = async (data) => {
       formData.append("csvFile", data.buffer);
 
       // Send the POST request
-      const response = await axios.post("https://nidhisharma.requestcatcher.com/", formData);
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/test", formData);
       // console.log("Response:", response.data);
       return response.data;
     } else {
@@ -99,7 +98,7 @@ const sendPostRequest = async (data) => {
         fileContent: data,
       };
       // Send the POST request
-      const response = await axios.post("https://nidhisharma.requestcatcher.com/", payload, {
+      const response = await axios.post("https://nidhisharma.requestcatcher.com/test", payload, {
         headers: { "Content-Type": "application/json" || "multipart/form-data" },
       });
       return response.data;
