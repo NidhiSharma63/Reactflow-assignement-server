@@ -43,6 +43,10 @@ const workFlowSchema = new mongoose.Schema({
       width: { type: Number },
     },
   ],
+  filterColumnValues: {
+    type: Map,
+    of: String, // Define the type of the map values, `String` in this case
+  },
 });
 
 // now we need to create collection

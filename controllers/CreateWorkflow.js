@@ -2,7 +2,7 @@ import WorkFlow from "../schema/WorkFlowSchema.js";
 
 const createWorkFlow = async (req, res, next) => {
   try {
-    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes } = req.body;
+    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes, filterColumnValues } = req.body;
     if (!userId || !workFlowSequence) throw new Error("Missing Data");
 
     /**
@@ -35,6 +35,7 @@ const createWorkFlow = async (req, res, next) => {
       workFlowId,
       workFlowEdges,
       workFlowNodes,
+      filterColumnValues,
     });
     await workFlow.save();
     res.status(200).send("workFlow");
@@ -46,13 +47,14 @@ const createWorkFlow = async (req, res, next) => {
 /** update workflow */
 const updateWorkFlow = async (req, res, next) => {
   try {
-    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes } = req.body;
+    const { userId, workFlowSequence, workFlowId, workFlowEdges, workFlowNodes, filterColumnValues } = req.body;
     if (!userId || !workFlowSequence) throw new Error("Missing Data");
     const workFlow = await WorkFlow.findOne({ workFlowId });
     if (!workFlow) throw new Error("Workflow not found");
     workFlow.workFlowSequence = workFlowSequence;
     workFlow.workFlowEdges = workFlowEdges;
     workFlow.workFlowNodes = workFlowNodes;
+    workFlow.filterColumnValues = filterColumnValues;
     await workFlow.save();
     res.status(200).send("workFlow");
   } catch (error) {

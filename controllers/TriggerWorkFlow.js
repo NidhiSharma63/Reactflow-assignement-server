@@ -38,7 +38,7 @@ const triggerWorkFlow = async (req, res, next) => {
           await sendPostRequest(data);
           break;
         case "Wait":
-          await wait(600);
+          await wait(10000);
           break;
         case "End":
           // Emitting an update at the end of the workflow
