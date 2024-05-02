@@ -7,7 +7,7 @@ const parseCsv = (buffer) => {
     Papa.parse(csvString, {
       header: true,
       complete: (results) => {
-        // console.log(results.data, "parsed data");
+        console.log(results.data, "parsed data");
         return resolve(results.data);
       },
       error: (error) => reject(error),
@@ -20,6 +20,7 @@ const filterData = (data, step) => {
     // check if the data is csv or not
     if (data?.buffer) {
       const csvString = data.buffer.toString("utf8");
+      console.log({ csvString }, "and", data);
       const rows = csvString.split("\n").map((row) => row.split(","));
       if (rows.length < 1) {
         throw new Error("Empty CSV data.");
@@ -47,9 +48,12 @@ const filterData = (data, step) => {
       });
 
       // Join processed rows back into a CSV string
-      return processedRows.map((row) => row.join(",")).join("\n");
+      const processedCsv = processedRows.map((row) => row.join(",")).join("\n");
+      const newFile = { ...data, buffer: Buffer.from(processedCsv) };
+      return newFile;
     } else {
       const jsonData = typeof data === "string" ? JSON.parse(data) : data;
+      console.log({ data }, { jsonData });
 
       // Validate that the provided field exists
       if (jsonData.length > 0 && !(step.filterValue in jsonData[0])) {

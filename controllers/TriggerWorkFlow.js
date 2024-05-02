@@ -22,7 +22,9 @@ const triggerWorkFlow = async (req, res, next) => {
 
     for (const step of sequence) {
       let activeStep = step.type;
+      // console.log({ activeStep });
       // Emitting an update at the start of each step
+
       io.emit("workflowUpdate", { workflowId, activeStep, status: "InProgress" });
 
       switch (step.type) {
@@ -33,18 +35,19 @@ const triggerWorkFlow = async (req, res, next) => {
           break;
         case "Convert Format":
           data = await parseCsv(file.buffer);
+          console.log({ data }, "from convert format");
           break;
         case "Send Post Request":
           await sendPostRequest(data);
           break;
         case "Wait":
-          await wait(10000);
+          await wait(500);
           break;
         case "End":
           // Emitting an update at the end of the workflow
           break;
         default:
-          throw new Error(`Unknown step: ${step}`);
+          throw new Error(`Unknown step: ${step.type}`);
       }
     }
 
