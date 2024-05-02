@@ -66,23 +66,6 @@ const filterData = (data, step) => {
 
       return processedData;
     }
-    // csv string
-
-    // if (data?.buffer) {
-    //   throw new Error("The Filter Data is not applicable to CSV file");
-    // }
-    // if (typeof data === "string") {
-    //   data = JSON.parse(data);
-    // }
-    // console.log({ data });
-    // return data.map((item) => {
-    //   return Object.fromEntries(
-    //     Object.entries(item).map(([key, value]) => {
-    //       // Check if the value is a string and convert it to lowercase
-    //       return [key, typeof value === "string" ? value.toLowerCase() : value];
-    //     })
-    //   );
-    // });
   } catch (error) {
     throw new Error(error);
     // return error;
